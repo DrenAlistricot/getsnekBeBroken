@@ -33,7 +33,7 @@ Game::Game( MainWindow& wnd )
 	rng2(std::random_device()()),
 	snek({2,2}),
 	goal(rng,brd,snek),
-	obstacle(rng2,brd,snek)
+	obstacle(rng2,brd, snek)
 {
 }
 
@@ -99,7 +99,12 @@ void Game::UpdateModel()
 				}
 				else
 				{
+					obstacle.isHit = next == obstacle.GetLocation();
 					const bool eating = next == goal.GetLocation();
+					if (obstacle.isHit)
+					{
+						GameIsOver = true;
+					}
 					if (eating)
 					{
 						snek.Grow();
@@ -109,7 +114,9 @@ void Game::UpdateModel()
 					snek.MoveBy(delta_loc);
 					if (eating)
 					{
+
 						goal.Respawn(rng, brd, snek);
+						obstacle.Respawn(rng, brd, snek);
 						obstacle.howMany++;
 					}
 				}
@@ -144,12 +151,14 @@ void Game::ComposeFrame()
 {
 	if (gameIsStarted)
 	{
-		/*for (int i = 0; i < obstacle.howMany; i++)
+		for (int i = 0; i < obstacle.howMany; i++)
 		{
+			
 			obstacle.Draw(brd);
-		}*/
+		}
 		snek.Draw(brd);
 		goal.Draw(brd);
+
 		if (GameIsOver)
 		{
 			SpriteCodex::DrawGameOver(350, 265, gfx);
